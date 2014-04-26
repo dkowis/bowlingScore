@@ -17,28 +17,6 @@ object BowlingScore {
 
 
   def apply(frames: String) = {
-
-    def calculateStrike(fl: List[Char]): Int = {
-      val pair = (fl.head, fl.tail.head)
-      val rolls = pair match {
-        case (_, '/') => {
-          10
-        }
-        case (BowlingNumber(one), BowlingNumber(two)) => {
-          one + two
-        }
-        case (one, two) => {
-          scorePins(one) + scorePins(two)
-        }
-      }
-
-      10 + rolls
-    }
-
-    def calculateSpare(fl: List[Char]): Int = {
-      scorePins(fl.head)
-    }
-
     def scorePins(pins: Char): Int = {
       pins match {
         case '-' => 0
@@ -47,35 +25,35 @@ object BowlingScore {
       }
     }
 
-    def calculateScore(frameIndex: Int, score: Int, fl: List[Char], previous: Char): Int = {
+    def calculateScore(frameIndex: Int, score: Int, fl: List[Char]): Int = {
       if (fl.isEmpty || frameIndex == 10) {
         //If we're all done, or we hit the 10th frame
         score
       } else {
-        val pins = fl.head
 
-        pins match {
-          case BowlingNumber(x) => {
-            //It's a number lets get two items
-            val nextRoll = fl.tail.head
-            val frameScore = nextRoll match {
-              case BowlingNumber(y) => {
-                y + x
-              }
-              case '/' => {
-                calculateSpare(fl.tail.tail) + (10 - x) + x
-              }
-            }
-            calculateScore(frameIndex + 1, score + frameScore, fl.tail.tail, nextRoll)
+        //What constitutes a frame?
+        // These are the three possible things
+        fl match {
+          case BowlingNumber(r1) :: BowlingNumber(r2) :: xs => {
+            calculateScore(frameIndex+1, score + r1 + r2, xs)
           }
-          case 'X' => {
-            calculateScore(frameIndex + 1, score + calculateStrike(fl.tail), fl.tail, pins)
+          case BowlingNumber(r1) :: '/' :: xs => {
+            val spareScore = scorePins(xs.head)
+            calculateScore(frameIndex+1, score + spareScore + 10, xs)
+          }
+          case 'X' :: xs => {
+            val strikeScore = xs match {
+              case BowlingNumber(ir1) :: '/' :: ixs => 10
+              case ir1 :: ir2 :: ixs => scorePins(ir1) + scorePins(ir2)
+            }
+            calculateScore(frameIndex+1, score + strikeScore + 10, xs)
           }
         }
+
       }
     }
 
     val pinsList = frames.toList
-    calculateScore(0, 0, pinsList, '-')
+    calculateScore(0, 0, pinsList)
   }
 }
