@@ -2,6 +2,10 @@ import org.scalatest.{FunSpec, Matchers}
 
 class PokerHandsSpec extends FunSpec with Matchers {
 
+  implicit val handToList:String => List[String] = {
+    _.split(" ").toList
+  }
+
   describe("comparing poker hands ") {
 
     val tests = Map(
@@ -13,7 +17,7 @@ class PokerHandsSpec extends FunSpec with Matchers {
       val hands = pair._1
       val winner = pair._2
 
-      it(s"With ${hands} Player ${winner} wins") {
+      it(s"With $hands Player $winner wins") {
         PokerHands(hands) should equal(winner)
       }
     })
@@ -26,32 +30,31 @@ class PokerHandsSpec extends FunSpec with Matchers {
 
     describe("can tell me if a hand is a") {
       it("high card") {
-        pending
+        PokerHands.scoreHand("2C 3H 4S 8C AH") should equal('HighCard)
       }
       it("pair") {
-        pending
+        PokerHands.scoreHand("2C 2H 4S 8C AH") should equal('Pair)
       }
       it("two pairs") {
-        pending
+        PokerHands.scoreHand("2C 2H 4C 4H AH") should equal('TwoPair)
       }
-
       it("three of a kind") {
-        pending
+        PokerHands.scoreHand("2C 2H 2S 4H AH") should equal('ThreeOfAKind)
       }
       it("straight") {
-        pending
+        PokerHands.scoreHand("3C 4H 5S 6H 7D") should equal('Straight)
       }
       it("flush") {
-        pending
+        PokerHands.scoreHand("3C 4C 7C 9C QC") should equal('Flush)
       }
       it("full house") {
-        pending
+        PokerHands.scoreHand("3C 3D 4C 4D 4S") should equal('FullHouse)
       }
       it("four of a kind") {
-        pending
+        PokerHands.scoreHand("3C 3S 3D 3H 4S") should equal('FourOfAKind)
       }
       it("straight flush") {
-        pending
+        PokerHands.scoreHand("4H 5H 6H 7H 8H") should equal('StraightFlush)
       }
     }
   }
