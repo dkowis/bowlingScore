@@ -3,7 +3,10 @@ object PokerHands {
 
   def apply(cards: String) = {
     //Convert the cards to a list
-    hands(cards)
+    val (one, two) = hands(cards)
+
+    
+
   }
 
   def hands(cards: String): (List[String], List[String]) = {
@@ -11,18 +14,20 @@ object PokerHands {
     (split.slice(0, 5).toList, split.slice(5, 10).toList)
   }
 
-  def scoreHand(hand: List[String]): Symbol = {
+  def rankHand(hand: List[String]): Symbol = {
     val ordered = List('A', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K')
+
     val numbersOnly = hand.map(c => c.charAt(0))
     val suitsOnly = hand.map(c => c.charAt(1))
-    val flush = suitsOnly.groupBy(l => l).map(t => (t._1, t._2.length)).count(_._2 == 5) == 1
 
+    val flush = suitsOnly.groupBy(l => l).map(t => (t._1, t._2.length)).count(_._2 == 5) == 1
     val straight = ordered.containsSlice(numbersOnly)
 
-    val groups = numbersOnly.groupBy(l => l).map(t => (t._1, t._2.length))
-    val pairs = groups.count(t => t._2 == 2)
-    val threeOfAKind = groups.count(t => t._2 == 3) == 1
-    val fourOfAKind = groups.count(t => t._2 == 4) == 1
+    val valueGroups = numbersOnly.groupBy(l => l).map(t => (t._1, t._2.length))
+
+    val pairs = valueGroups.count(t => t._2 == 2)
+    val threeOfAKind = valueGroups.count(t => t._2 == 3) == 1
+    val fourOfAKind = valueGroups.count(t => t._2 == 4) == 1
 
     if (flush && straight) {
       'StraightFlush
