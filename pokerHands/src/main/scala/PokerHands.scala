@@ -1,12 +1,26 @@
 
 object PokerHands {
+  //Ranked lowest to highest
+  val ranks = List('HighCard, 'Pair, 'TwoPair, 'ThreeOfAKind, 'Straight, 'Flush, 'FullHouse, 'FourOfAKind, 'StraightFlush)
+  val cardValues = List('2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K', 'A')
 
   def apply(cards: String) = {
     //Convert the cards to a list
     val (one, two) = hands(cards)
 
-    
+    //Will have to do additional magic logic with a HighCard
+    val rank1 = ranks.indexOf(rankHand(one))
+    val rank2 = ranks.indexOf(rankHand(two))
 
+    if(rank1 > rank2) {
+      1
+    } else if(rank2 > rank1){
+      2
+    } else {
+      //they must be the same, and it's high card of what's left...
+      //RUH ROH, need to filter out the remaining card?
+      0
+    }
   }
 
   def hands(cards: String): (List[String], List[String]) = {
@@ -15,13 +29,13 @@ object PokerHands {
   }
 
   def rankHand(hand: List[String]): Symbol = {
-    val ordered = List('A', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K')
+    val straightOrder = List('A', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K', 'A')
 
     val numbersOnly = hand.map(c => c.charAt(0))
     val suitsOnly = hand.map(c => c.charAt(1))
 
     val flush = suitsOnly.groupBy(l => l).map(t => (t._1, t._2.length)).count(_._2 == 5) == 1
-    val straight = ordered.containsSlice(numbersOnly)
+    val straight = straightOrder.containsSlice(numbersOnly)
 
     val valueGroups = numbersOnly.groupBy(l => l).map(t => (t._1, t._2.length))
 
