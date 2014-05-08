@@ -4,6 +4,14 @@ object PokerHands {
   val ranks = List('HighCard, 'Pair, 'TwoPair, 'ThreeOfAKind, 'Straight, 'Flush, 'FullHouse, 'FourOfAKind, 'StraightFlush)
   val cardValues = List('2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K', 'A')
 
+  //TODO: create extractor objects to use in a pattern match for converting a "hand" to a Ranked hand
+  // A ranked hand: ('TwoPair, '4', List('5','6','K'))
+  //                 Rank    , value of that rank, remaining cards
+  // For HighCard: ('HighCard, 'A', List('2','3','4','6'))
+
+  // Then a method that takes this tuple and can compare two of them!
+
+
   def apply(cards: String) = {
     //Convert the cards to a list
     val (one, two) = hands(cards)

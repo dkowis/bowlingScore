@@ -5,6 +5,11 @@ import java.lang.Comparable
  */
 object Ranks {
 
+  def apply(cards:List[String]):Hand = {
+    //TODO: turn a list of cards into one of the subclasses of Hand
+    ???
+  }
+
   trait Hand extends Comparable[Hand] {
     def compareTo(o: Hand): Int = {
       val tf: (Hand => Int) = selfMatch orElse {
