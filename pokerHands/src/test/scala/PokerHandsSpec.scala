@@ -2,7 +2,7 @@ import org.scalatest.{FunSpec, Matchers}
 
 class PokerHandsSpec extends FunSpec with Matchers {
 
-  implicit val handToList:String => List[String] = {
+  implicit val handToList: String => List[String] = {
     _.split(" ").toList
   }
 
@@ -10,7 +10,10 @@ class PokerHandsSpec extends FunSpec with Matchers {
 
     val tests = Map(
       "2H 3D 5S 9C KD 2C 3H 4S 8C AH" -> 2,
-      "2H 2D 3D 4S 9C 2C 3H 4S 8C AH" -> 1
+      "2H 2D 3D 4S 9C 2C 3H 4S 8C AH" -> 1,
+      "2H 3D 5S 9C KD 2D 3H 5C 9S KH" -> 0,
+      "2H 2D 4S 4C 4H 2S 3S 8S QS AS" -> 1,
+      "2H 3D 5S 9C KD 2C 3H 4S 8C KH" -> 1
     )
 
     tests.map(pair => {
@@ -42,10 +45,10 @@ class PokerHandsSpec extends FunSpec with Matchers {
         PokerHands.rankHand("2C 2H 2S 4H AH") should equal(('ThreeOfAKind, List('2'), List('4', 'A')))
       }
       it("straight") {
-        PokerHands.rankHand("3C 4H 5S 6H 7D") should equal(('Straight, List('3','4','5','6','7'), List()))
+        PokerHands.rankHand("3C 4H 5S 6H 7D") should equal(('Straight, List('3', '4', '5', '6', '7'), List()))
       }
       it("flush") {
-        PokerHands.rankHand("3C 4C 7C 9C QC") should equal(('Flush, List('3','4','7','9','Q'), List()))
+        PokerHands.rankHand("3C 4C 7C 9C QC") should equal(('Flush, List('3', '4', '7', '9', 'Q'), List()))
       }
       it("full house") {
         PokerHands.rankHand("3C 3D 4C 4D 4S") should equal(('FullHouse, List('3', '4'), List()))
@@ -54,7 +57,15 @@ class PokerHandsSpec extends FunSpec with Matchers {
         PokerHands.rankHand("3C 3S 3D 3H 4S") should equal(('FourOfAKind, List('3'), List('4')))
       }
       it("straight flush") {
-        PokerHands.rankHand("4H 5H 6H 7H 8H") should equal(('StraightFlush, List('4','5','6','7','8'), List()))
+        PokerHands.rankHand("4H 5H 6H 7H 8H") should equal(('StraightFlush, List('4', '5', '6', '7', '8'), List()))
+      }
+    }
+
+    describe("comparing two ranked hands") {
+      it("ranks HighCards appropriately") {
+        val hand1 = ('HighCard, List('A'), List('2', '3', '4', '8'))
+        val hand2 = ('HighCard, List('K'), List('2', '3', '4', '8'))
+        PokerHands.compareHands(hand1, hand2) should equal(1)
       }
     }
   }

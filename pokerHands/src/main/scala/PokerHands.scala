@@ -1,10 +1,8 @@
-
 object PokerHands {
   //Ranked lowest to highest
   val ranks = List('HighCard, 'Pair, 'TwoPair, 'ThreeOfAKind, 'Straight, 'Flush, 'FullHouse, 'FourOfAKind, 'StraightFlush)
   val cardValues = List('2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K', 'A')
 
-  //TODO: create extractor objects to use in a pattern match for converting a "hand" to a Ranked hand
   //Extractors made it overly complicated, because I duplicated so much data....
   // A ranked hand: ('TwoPair, List('4','5'), List('6','K'))
   //                 Rank    , value of that rank, remaining cards
@@ -19,24 +17,49 @@ object PokerHands {
     //Convert the cards to a list
     val (one, two) = hands(cards)
 
-    //Will have to do additional magic logic with a HighCard
-    val rank1 = ranks.indexOf(rankHand(one))
-    val rank2 = ranks.indexOf(rankHand(two))
-
-    if (rank1 > rank2) {
-      1
-    } else if (rank2 > rank1) {
-      2
-    } else {
-      //they must be the same, and it's high card of what's left...
-      //RUH ROH, need to filter out the remaining card?
-      0
+    compareHands(rankHand(one), rankHand(two)) match {
+      case -1 => 2
+      case 0 => 0
+      case 1 => 1
     }
   }
 
   def hands(cards: String): (List[String], List[String]) = {
     val split = cards.split(" ")
     (split.slice(0, 5).toList, split.slice(5, 10).toList)
+  }
+
+  //Follows the compareTo logic
+  def compareHands(hand1:HandRank, hand2:HandRank):Int = {
+    def listCompare(list1:List[Char], list2:List[Char]):Int = {
+      if(list1.isEmpty || list2.isEmpty) {
+        0 //they're the same!
+      } else {
+        val comparison = cardValues.indexOf(list1.head).compareTo(cardValues.indexOf(list2.head))
+        if(comparison == 0) {
+          //They're the same, iterate!
+          listCompare(list1.tail, list2.tail)
+        } else {
+          comparison
+        }
+      }
+    }
+    if(hand1._1 == hand2._1) {
+      //The hands are the same rank, compare the subranks
+      if(hand1._2 == hand2._2) {
+        //the subranks are the same, need to loop through the final cards
+        listCompare(hand1._3, hand2._3)
+      } else {
+        //Loop through the list of subranks
+        listCompare(hand1._2, hand2._2)
+      }
+    } else {
+      ranks.indexOf(hand1._1).compareTo(ranks.indexOf(hand2._1)) match {
+        case -1 => -1
+        case 0 => 0
+        case 1 => 1
+      }
+    }
   }
 
   def rankHand(hand: List[String]): HandRank = {
