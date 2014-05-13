@@ -54,11 +54,7 @@ object PokerHands {
         listCompare(hand1._2, hand2._2)
       }
     } else {
-      ranks.indexOf(hand1._1).compareTo(ranks.indexOf(hand2._1)) match {
-        case -1 => -1
-        case 0 => 0
-        case 1 => 1
-      }
+      ranks.indexOf(hand1._1).compareTo(ranks.indexOf(hand2._1))
     }
   }
 
