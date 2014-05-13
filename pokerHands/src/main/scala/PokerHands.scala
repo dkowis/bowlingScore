@@ -5,12 +5,15 @@ object PokerHands {
   val cardValues = List('2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K', 'A')
 
   //TODO: create extractor objects to use in a pattern match for converting a "hand" to a Ranked hand
-  // A ranked hand: ('TwoPair, '4', List('5','6','K'))
+  //Extractors made it overly complicated, because I duplicated so much data....
+  // A ranked hand: ('TwoPair, List('4','5'), List('6','K'))
   //                 Rank    , value of that rank, remaining cards
-  // For HighCard: ('HighCard, 'A', List('2','3','4','6'))
+  // For HighCard: ('HighCard, List('A'), List('2','3','4','6'))
 
   // Then a method that takes this tuple and can compare two of them!
 
+  type HandRank = (Symbol, List[Char], List[Char])
+  val straightOrder = List('A', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K', 'A')
 
   def apply(cards: String) = {
     //Convert the cards to a list
@@ -20,9 +23,9 @@ object PokerHands {
     val rank1 = ranks.indexOf(rankHand(one))
     val rank2 = ranks.indexOf(rankHand(two))
 
-    if(rank1 > rank2) {
+    if (rank1 > rank2) {
       1
-    } else if(rank2 > rank1){
+    } else if (rank2 > rank1) {
       2
     } else {
       //they must be the same, and it's high card of what's left...
@@ -36,8 +39,7 @@ object PokerHands {
     (split.slice(0, 5).toList, split.slice(5, 10).toList)
   }
 
-  def rankHand(hand: List[String]): Symbol = {
-    val straightOrder = List('A', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K', 'A')
+  def rankHand(hand: List[String]): HandRank = {
 
     val numbersOnly = hand.map(c => c.charAt(0))
     val suitsOnly = hand.map(c => c.charAt(1))
@@ -52,23 +54,23 @@ object PokerHands {
     val fourOfAKind = valueGroups.count(t => t._2 == 4) == 1
 
     if (flush && straight) {
-      'StraightFlush
+      ('StraightFlush, numbersOnly, List())
     } else if (flush) {
-      'Flush
+      ('Flush, numbersOnly, List())
     } else if (pairs == 1 && threeOfAKind) {
-      'FullHouse
+      ('FullHouse, valueGroups.filter(t => t._2 == 2).keys.toList ++ valueGroups.filter(t => t._2 == 3).keys, List())
     } else if (fourOfAKind) {
-      'FourOfAKind
+      ('FourOfAKind, valueGroups.filter(t => t._2 == 4).keys.toList, valueGroups.filterNot(t => t._2 == 4).keys.toList)
     } else if (pairs == 1) {
-      'Pair
+      ('Pair, valueGroups.filter(t => t._2 == 2).keys.toList, numbersOnly.intersect(valueGroups.filterNot(t => t._2 == 2).keys.toList))
     } else if (pairs == 2) {
-      'TwoPair
+      ('TwoPair, valueGroups.filter(t => t._2 == 2).keys.toList, numbersOnly.filter(i => valueGroups.filterNot(t => t._2 == 2).keys.toList.contains(i)))
     } else if (threeOfAKind) {
-      'ThreeOfAKind
+      ('ThreeOfAKind, valueGroups.filter(t => t._2 == 3).keys.toList, numbersOnly.intersect(valueGroups.filterNot(t => t._2 == 3).keys.toList))
     } else if (straight) {
-      'Straight
+      ('Straight, numbersOnly, List())
     } else {
-      'HighCard
+      ('HighCard, List(numbersOnly.last), numbersOnly.slice(0,4))
     }
   }
 }
